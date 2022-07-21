@@ -1,11 +1,11 @@
 import { css } from '@emotion/react'
 
-export interface CardProps {
+export interface Card {
   value: number
   color: 'pink' | 'beige' | 'blue' | 'red'
 }
 
-export function Card({ value, color, ...props }: CardProps) {
+export default function GameCard({ value, color, ...props }: Card) {
   return (
     <div css={styles.card(color)} {...props}>
       <span>{value}</span>

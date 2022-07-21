@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 import { css, Global } from '@emotion/react'
-import { GameContextProvider } from './context/game-context'
 
 const globalStyles = css`
   body {
@@ -35,9 +34,7 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Global styles={globalStyles} />
-    <GameContextProvider>
-      <App />
-    </GameContextProvider>
+    <App />
   </React.StrictMode>,
 )
 

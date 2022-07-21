@@ -1,6 +1,6 @@
 import humanId from 'human-id'
 
-export function createPlayerId() {
+export function createHumanId() {
   return humanId({
     separator: '-',
     capitalize: false,

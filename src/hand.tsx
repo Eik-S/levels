@@ -1,14 +1,14 @@
 import { css } from '@emotion/react'
-import { Card, CardProps } from './card'
+import GameCard, { Card } from './card'
 
 interface HandProps {
-  cards: CardProps[]
+  cards: Card[]
 }
 export function Hand({ cards }: HandProps) {
   return (
     <div css={styles.hand}>
       {cards.map((card, index) => (
-        <Card key={index} color={card.color} value={card.value} />
+        <GameCard key={index} color={card.color} value={card.value} />
       ))}
     </div>
   )

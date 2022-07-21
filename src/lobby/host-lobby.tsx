@@ -1,10 +1,12 @@
+import { css } from '@emotion/react'
 import { useEffect, useState } from 'react'
-import { useGameContext } from '../context/game-context'
+import { useGameBoardContext } from '../context/game-board-context'
 
 export function HostLobby() {
   const [waitingDots, setWaitingDots] = useState('')
+  const [isLobbyNameInClipboard, setIsLobbyNameInClipboard] = useState(false)
 
-  const { players, playerId } = useGameContext()
+  const { players, lobbyId } = useGameBoardContext()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -13,12 +15,23 @@ export function HostLobby() {
     return () => clearInterval(interval)
   }, [])
 
+  function saveLobbyIdToClipboard() {
+    if (lobbyId === undefined) return
+    navigator.clipboard.writeText(lobbyId)
+    setIsLobbyNameInClipboard(true)
+  }
+
   return (
     <div>
       <h1>
         Session name:
         <br />
-        {playerId}
+        <span
+          css={styles.lobbyName(isLobbyNameInClipboard)}
+          onClick={() => saveLobbyIdToClipboard()}
+        >
+          {lobbyId}
+        </span>
       </h1>
       {players.length === 0 ? (
         <p>Waiting for other players{waitingDots}</p>
@@ -31,4 +44,14 @@ export function HostLobby() {
       )}
     </div>
   )
+}
+
+const styles = {
+  lobbyName: (copied: boolean) => css`
+    cursor: copy;
+    ${copied &&
+    css`
+      cursor: default;
+    `}
+  `,
 }

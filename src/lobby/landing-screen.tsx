@@ -1,31 +1,26 @@
 import { css } from '@emotion/react'
 import { useState } from 'react'
-import { useGameContext } from '../context/game-context'
 
-interface LandingScreenProps {}
+interface LandingScreenProps {
+  onHostGame: () => void
+  onJoinGame: (lobbyName: string) => void
+}
 
-export function LandingScreen({ ...props }: LandingScreenProps) {
-  const { createLobby, joinGame } = useGameContext()
+export function LandingScreen({ onJoinGame, onHostGame, ...props }: LandingScreenProps) {
   const [lobbyInput, setLobbyInput] = useState('')
 
   function handleClickJoinButton() {
     if (lobbyInput.length === 0) return
-    joinGame(lobbyInput)
+    onJoinGame(lobbyInput)
   }
 
   return (
     <div css={styles.landingScreen} {...props}>
       <h1>play levels</h1>
-      <label htmlFor="join-button" hidden={true}>
-        Join an existing game
-      </label>
-      <label htmlFor="lobby-input" hidden={true}>
-        Enter a lobby id
-      </label>
-      <label htmlFor="host-button" hidden={true}>
-        Host a new game
-      </label>
       <div css={styles.joinInputButton}>
+        <label htmlFor="lobby-input" hidden={true}>
+          Enter a lobby id
+        </label>
         <input
           type="text"
           name="lobby-input"
@@ -33,11 +28,19 @@ export function LandingScreen({ ...props }: LandingScreenProps) {
           value={lobbyInput}
           onChange={(event) => setLobbyInput(event.target.value)}
         />
+
+        <label htmlFor="join-button" hidden={true}>
+          Join an existing game
+        </label>
         <button name="join-button" onClick={() => handleClickJoinButton()}>
           join
         </button>
       </div>
-      <button name="host" onClick={() => createLobby()}>
+
+      <label htmlFor="host-button" hidden={true}>
+        Host a new game
+      </label>
+      <button name="host-button" onClick={() => onHostGame()}>
         host
       </button>
     </div>
