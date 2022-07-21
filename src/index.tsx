@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 import { css, Global } from '@emotion/react'
+import { GameContextProvider } from './context/game-context'
 
 const globalStyles = css`
   body {
@@ -11,6 +12,18 @@ const globalStyles = css`
       'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #000;
+    color: white;
+  }
+
+  button {
+    padding: 8px 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 4px;
   }
 
   code {
@@ -22,7 +35,9 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Global styles={globalStyles} />
-    <App />
+    <GameContextProvider>
+      <App />
+    </GameContextProvider>
   </React.StrictMode>,
 )
 
