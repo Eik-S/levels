@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import { GameClientContextProvider } from './context/game-client-context'
 import { GameHostContextProvider } from './context/game-host-context'
 import { HostLobby } from './lobby/host-lobby'
 import { JoinLobby } from './lobby/join-lobby'
@@ -23,8 +24,11 @@ export function App() {
           <HostLobby />
         </GameHostContextProvider>
       )}
-      {/* TODO: rename to ClientLobby and use LobbyId in its own GameClientContextProvider */}
-      {gameMode === 'client' && <JoinLobby />}
+      {gameMode === 'client' && lobbyId !== undefined && (
+        <GameClientContextProvider lobbyId={lobbyId}>
+          <JoinLobby />
+        </GameClientContextProvider>
+      )}
     </Fragment>
   )
 }
