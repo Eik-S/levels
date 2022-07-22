@@ -7,39 +7,68 @@ export interface PeerJSError extends Error {
   type: PeerErrorType
 }
 
+type SessionStatus = 'ready' | 'connected' | 'disconnected' | 'failed'
 interface GameClientContextApi {
   lobbyId: string | undefined
   playerId: string | undefined
   playerNames: string[]
+  sessionStatus: SessionStatus
 }
 
 function useGameClient({ lobbyId }: { lobbyId: string }): GameClientContextApi {
   const [playerId, setPlayerId] = useSessionStorage('playerId', createHumanId())
   const [peer, setPeer] = useState<Peer | undefined>(undefined)
   const [playerNames, setPlayerNames] = useState<string[]>([])
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>('disconnected')
 
   useEffect(() => {
     if (peer !== undefined) return
     const newPeer = new Peer(playerId)
+
     newPeer.on('error', (err) => {
       const peerError = err as PeerJSError
-      console.log({ errorType: peerError.type, newPeer })
+      const errorType = peerError.type
+      console.debug({ errorType: errorType, newPeer, error: peerError })
+      setSessionStatus('disconnected')
 
-      // retry connecting with new playerId
-      setPlayerId(createHumanId())
-      setPeer(undefined)
+      if (
+        errorType === 'unavailable-id' ||
+        errorType === 'network' ||
+        errorType === 'disconnected'
+      ) {
+        console.log('reconnecting')
+        newPeer.reconnect()
+      } else if (errorType === 'peer-unavailable') {
+        setSessionStatus('failed')
+      } else {
+        console.log('switching player id')
+        setPlayerId(createHumanId())
+        setPeer(undefined)
+      }
     })
     newPeer.on('open', () => {
-      console.log({ message: 'peer successfully created', newPeer })
+      console.log({
+        message: 'peer successfully created',
+        playerId,
+        newPeer: { ...newPeer },
+      })
+      setSessionStatus('ready')
       setPeer(newPeer)
     })
+    return () => {
+      newPeer.disconnect()
+    }
   }, [playerId, peer, setPlayerId])
 
   // initiate peer connection
   // if all parameters are set
   useEffect(() => {
-    if (lobbyId === undefined || peer === undefined) return
+    if (peer === undefined || sessionStatus === 'disconnected') return
+
     const conn = peer.connect(lobbyId)
+    console.log({ message: `connecting to host ${lobbyId}`, conn })
+    if (conn === undefined) return
+
     conn.on('data', (data) => {
       console.log({ data })
     })
@@ -49,12 +78,18 @@ function useGameClient({ lobbyId }: { lobbyId: string }): GameClientContextApi {
     conn.on('close', () => {
       console.log(`connection to host ${conn.peer} closed`)
     })
-  }, [lobbyId, peer, setPlayerId])
+    conn.on('error', (err) => {
+      const error = err as PeerJSError
+      const errorType = error.type
+      console.log({ errorType, conn })
+    })
+  }, [sessionStatus, lobbyId, peer, setPlayerId])
 
   return {
     lobbyId,
     playerId,
     playerNames,
+    sessionStatus,
   }
 }
 const GameClientContext = createContext<GameClientContextApi | undefined>(undefined)

@@ -26,7 +26,7 @@ export function App() {
       )}
       {gameMode === 'client' && lobbyId !== undefined && (
         <GameClientContextProvider lobbyId={lobbyId}>
-          <JoinLobby />
+          <JoinLobby onSessionFailed={() => setGameMode(undefined)} />
         </GameClientContextProvider>
       )}
     </Fragment>

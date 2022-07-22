@@ -1,16 +1,26 @@
-interface JoinLobbyProps {}
-export function JoinLobby({ ...props }: JoinLobbyProps) {
-  // const { players, lobbyId } = useGameContext()
+import { useEffect } from 'react'
+import { useGameClientContext } from '../context/game-client-context'
 
-  // return (
-  //   <div {...props}>
-  //     <h1>{lobbyId}s lobby</h1>
-  //     <ul>
-  //       {players.map((player, index) => (
-  //         <li key={index}>{player.id}</li>
-  //       ))}
-  //     </ul>
-  //   </div>
-  // )
-  return null
+interface JoinLobbyProps {
+  onSessionFailed: () => void
+}
+export function JoinLobby({ onSessionFailed, ...props }: JoinLobbyProps) {
+  const { lobbyId, sessionStatus, playerNames } = useGameClientContext()
+
+  useEffect(() => {
+    if (sessionStatus === 'failed') {
+      onSessionFailed()
+    }
+  }, [onSessionFailed, sessionStatus])
+
+  return (
+    <div {...props}>
+      <h1>{lobbyId}s lobby</h1>
+      <ul>
+        {playerNames.map((playerName, index) => (
+          <li key={index}>{playerName}</li>
+        ))}
+      </ul>
+    </div>
+  )
 }
