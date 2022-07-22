@@ -1,12 +1,12 @@
 import { css } from '@emotion/react'
 import { useEffect, useState } from 'react'
-import { useGameBoardContext } from '../context/game-board-context'
+import { useGameHostContext } from '../context/game-host-context'
 
 export function HostLobby() {
   const [waitingDots, setWaitingDots] = useState('')
   const [isLobbyNameInClipboard, setIsLobbyNameInClipboard] = useState(false)
 
-  const { players, lobbyId } = useGameBoardContext()
+  const { players, lobbyId } = useGameHostContext()
 
   useEffect(() => {
     const interval = setInterval(() => {
