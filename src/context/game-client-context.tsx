@@ -23,14 +23,15 @@ function useGameClient({ lobbyId }: { lobbyId: string }): GameClientContextApi {
     const newPeer = new Peer(playerId)
     newPeer.on('error', (err) => {
       const peerError = err as PeerJSError
-      console.log({ errorType: peerError.type, newPeer })
+      console.log({ errorType: peerError.type, peer: { ...newPeer } })
 
       // retry connecting with new playerId
-      setPlayerId(createHumanId())
-      setPeer(undefined)
+      if (peerError.type === 'unavailable-id') {
+        newPeer.reconnect()
+      }
     })
     newPeer.on('open', () => {
-      console.log({ message: 'peer successfully created', newPeer })
+      console.log({ message: 'peer successfully created', peer: { ...newPeer } })
       setPeer(newPeer)
     })
   }, [playerId, peer, setPlayerId])
@@ -39,6 +40,7 @@ function useGameClient({ lobbyId }: { lobbyId: string }): GameClientContextApi {
   // if all parameters are set
   useEffect(() => {
     if (lobbyId === undefined || peer === undefined) return
+    console.log(`connecting to ${lobbyId}`, { peer: { ...peer } })
     const conn = peer.connect(lobbyId)
     conn.on('data', (data) => {
       console.log({ data })

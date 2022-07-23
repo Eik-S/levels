@@ -1,8 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { App } from './App'
 import reportWebVitals from './reportWebVitals'
 import { css, Global } from '@emotion/react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { LandingScreen } from './lobby/landing-screen'
+import { GameHostContextProvider } from './context/game-host-context'
+import { HostLobby } from './lobby/host-lobby'
+import { GameClientContextProvider } from './context/game-client-context'
+import { JoinLobby } from './lobby/join-lobby'
+import { LobbyWrapper } from './lobby/lobby-wrapper'
 
 const globalStyles = css`
   body {
@@ -34,7 +40,20 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Global styles={globalStyles} />
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingScreen />} />
+        <Route
+          path="/host/"
+          element={
+            <GameHostContextProvider>
+              <HostLobby />
+            </GameHostContextProvider>
+          }
+        />
+        <Route path="/join/:lobbyId" element={<LobbyWrapper />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
 )
 

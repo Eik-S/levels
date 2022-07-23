@@ -1,17 +1,16 @@
 import { css } from '@emotion/react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-interface LandingScreenProps {
-  onHostGame: () => void
-  onJoinGame: (lobbyName: string) => void
-}
+interface LandingScreenProps {}
 
-export function LandingScreen({ onJoinGame, onHostGame, ...props }: LandingScreenProps) {
+export function LandingScreen({ ...props }: LandingScreenProps) {
   const [lobbyInput, setLobbyInput] = useState('')
+  const navigate = useNavigate()
 
   function handleClickJoinButton() {
     if (lobbyInput.length === 0) return
-    onJoinGame(lobbyInput)
+    navigate(`/join/${lobbyInput}`)
   }
 
   return (
@@ -40,7 +39,7 @@ export function LandingScreen({ onJoinGame, onHostGame, ...props }: LandingScree
       <label htmlFor="host-button" hidden={true}>
         Host a new game
       </label>
-      <button name="host-button" onClick={() => onHostGame()}>
+      <button name="host-button" onClick={() => navigate('/host')}>
         host
       </button>
     </div>
