@@ -10,6 +10,14 @@ import { LobbyWrapper } from './lobby/lobby-wrapper'
 import { Table } from './table/table'
 
 const globalStyles = css`
+  @font-face {
+    font-family: NotoEmoji;
+    src: url('/NotoEmoji-VariableFont_wght.ttf') format('truetype');
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
   body {
     margin: 0;
     font-family:
@@ -49,6 +57,12 @@ const globalStyles = css`
     letter-spacing: 0.05em;
     border: none;
     border-radius: 4px;
+  }
+
+  label {
+    display: block;
+    padding: 0 0 6px 6px;
+    margin-top: 12px;
   }
 
   code {
