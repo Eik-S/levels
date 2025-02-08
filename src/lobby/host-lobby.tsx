@@ -1,12 +1,14 @@
 import { css } from '@emotion/react'
 import { useEffect, useState } from 'react'
 import { useGameHostContext } from '../context/game-host-context'
+import { useNavigate } from 'react-router-dom'
 
 export function HostLobby() {
   const [waitingDots, setWaitingDots] = useState('')
   const [isLobbyNameInClipboard, setIsLobbyNameInClipboard] = useState(false)
 
-  const { players, lobbyId } = useGameHostContext()
+  const navigate = useNavigate()
+  const { players, lobbyId, messagePlayer } = useGameHostContext()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,6 +21,20 @@ export function HostLobby() {
     if (lobbyId === undefined) return
     navigator.clipboard.writeText(lobbyId)
     setIsLobbyNameInClipboard(true)
+  }
+
+  function startGame() {
+    players.forEach((player) => {
+      messagePlayer(
+        {
+          type: 'gameStateChanged',
+          gameState: 'running',
+        },
+        player.id,
+      )
+    })
+
+    navigate('/host/table')
   }
 
   return (
@@ -37,11 +53,12 @@ export function HostLobby() {
         <p>Waiting for other players{waitingDots}</p>
       ) : (
         <ul>
-          {players.map((player, index) => (
-            <li key={index}>{player.id}</li>
+          {players.map((player) => (
+            <li key={player.id}>{player.id}</li>
           ))}
         </ul>
       )}
+      <button onClick={startGame}>start game</button>
     </div>
   )
 }

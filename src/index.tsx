@@ -1,14 +1,15 @@
 import React from 'react'
-import ReactDOM from 'react-dom/client'
-import reportWebVitals from './reportWebVitals'
 import { css, Global } from '@emotion/react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { LandingScreen } from './lobby/landing-screen'
+import ReactDOM from 'react-dom/client'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { GameHostContextProvider } from './context/game-host-context'
 import { HostLobby } from './lobby/host-lobby'
-import { GameClientContextProvider } from './context/game-client-context'
-import { JoinLobby } from './lobby/join-lobby'
+import { LandingScreen } from './lobby/landing-screen'
 import { LobbyWrapper } from './lobby/lobby-wrapper'
+import reportWebVitals from './reportWebVitals'
+import { Table } from './table/table'
+import { JoinLobby } from './lobby/join-lobby'
+import { Hand } from './hand/hand'
 
 const globalStyles = css`
   body {
@@ -38,23 +39,29 @@ const globalStyles = css`
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
-  <React.StrictMode>
+  <>
     <Global styles={globalStyles} />
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingScreen />} />
         <Route
-          path="/host/"
+          path="host"
           element={
             <GameHostContextProvider>
-              <HostLobby />
+              <Outlet />
             </GameHostContextProvider>
           }
-        />
-        <Route path="/join/:lobbyId" element={<LobbyWrapper />} />
+        >
+          <Route path="lobby" element={<HostLobby />} />
+          <Route path="table" element={<Table />} />
+        </Route>
+        <Route path="/join/:lobbyId" element={<LobbyWrapper />}>
+          <Route path="lobby" element={<JoinLobby />} />
+          <Route path="hand" element={<Hand />} />
+        </Route>
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
+  </>,
 )
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,65 +1,105 @@
 import { Peer, PeerErrorType } from 'peerjs'
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { useSessionStorage } from '../hooks/use-session-storage'
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Message } from '../models/message-model'
+import { PeerConnection } from '../models/peer-connection-model'
+import { Player } from '../models/players-model'
 import { createHumanId } from '../utils/id-creator'
 
 export interface PeerJSError extends Error {
   type: PeerErrorType
 }
 
-interface GameClientContextApi {
-  lobbyId: string | undefined
-  playerId: string | undefined
-  playerNames: string[]
-}
-
-function useGameClient({ lobbyId }: { lobbyId: string }): GameClientContextApi {
-  const [playerId, setPlayerId] = useSessionStorage('playerId', createHumanId())
+function useGameClient({ lobbyId }: { lobbyId: string }) {
+  const [players, setPlayers] = useState<Player[]>([])
   const [peer, setPeer] = useState<Peer | undefined>(undefined)
-  const [playerNames, setPlayerNames] = useState<string[]>([])
+  const [peerConnection, setPeerConnection] = useState<PeerConnection | undefined>(undefined)
 
+  const navigate = useNavigate()
+
+  // peer setup and error handling
   useEffect(() => {
-    if (peer !== undefined) return
-    const newPeer = new Peer(playerId)
-    newPeer.on('error', (err) => {
-      const peerError = err as PeerJSError
-      console.log({ errorType: peerError.type, peer: { ...newPeer } })
+    const peer = new Peer(createHumanId())
+    peer.on('open', () => {
+      setPeer(peer)
+      setPeerConnection({
+        state: 'connecting',
+        peerId: lobbyId,
+      })
+    })
+    peer.on('error', (error) => {
+      const peerError = error as PeerJSError
+      if (peerError.type === 'peer-unavailable') {
+        setPeerConnection({
+          state: 'unavailable',
+          peerId: lobbyId,
+        })
+      }
+      console.log({ peerError: peerError.type, peer })
+    })
 
-      // retry connecting with new playerId
-      if (peerError.type === 'unavailable-id') {
-        newPeer.reconnect()
+    return () => {
+      peer.disconnect()
+      peer.destroy()
+    }
+  }, [lobbyId])
+
+  // peerConnection setup and error handling
+  useEffect(() => {
+    if (typeof peerConnection === 'undefined' || peerConnection.state !== 'connecting') {
+      return
+    }
+
+    const connection = peer!.connect(lobbyId)
+
+    connection.on('open', () => {
+      setPeerConnection({
+        state: 'connected',
+        connection,
+        peerId: lobbyId,
+      })
+      console.log({
+        message: `connection opened ${connection.peer}`,
+        connection: { ...connection },
+      })
+    })
+
+    connection.on('error', (error) => {
+      const connectionError = error as PeerJSError
+
+      console.log({ connectionError: connectionError.type, peer, connection })
+    })
+
+    connection.on('data', (data) => {
+      const message = data as Message
+      if (message.type === 'playersStateChanged') {
+        setPlayers(message.players)
+      }
+
+      if (message.type === 'gameStateChanged') {
+        if (document.location.href.endsWith('lobby')) {
+          navigate('./hand')
+        }
       }
     })
-    newPeer.on('open', () => {
-      console.log({ message: 'peer successfully created', peer: { ...newPeer } })
-      setPeer(newPeer)
-    })
-  }, [playerId, peer, setPlayerId])
+  }, [peerConnection, peer, lobbyId, navigate])
 
-  // initiate peer connection
-  // if all parameters are set
-  useEffect(() => {
-    if (lobbyId === undefined || peer === undefined) return
-    console.log(`connecting to ${lobbyId}`, { peer: { ...peer } })
-    const conn = peer.connect(lobbyId)
-    conn.on('data', (data) => {
-      console.log({ data })
+  function tryToReconnect() {
+    setPeerConnection({
+      state: 'connecting',
+      peerId: lobbyId,
     })
-    conn.on('open', () => {
-      console.log(`connection to host ${conn.peer} opened`)
-    })
-    conn.on('close', () => {
-      console.log(`connection to host ${conn.peer} closed`)
-    })
-  }, [lobbyId, peer, setPlayerId])
+  }
 
   return {
     lobbyId,
-    playerId,
-    playerNames,
+    players,
+    peerConnectionState: peerConnection?.state,
+    tryToReconnect,
   }
 }
-const GameClientContext = createContext<GameClientContextApi | undefined>(undefined)
+
+const GameClientContext = createContext<ReturnType<typeof useGameClient> | undefined>(undefined)
 
 interface GameClientContextProviderProps {
   lobbyId: string

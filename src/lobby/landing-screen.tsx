@@ -10,7 +10,7 @@ export function LandingScreen({ ...props }: LandingScreenProps) {
 
   function handleClickJoinButton() {
     if (lobbyInput.length === 0) return
-    navigate(`/join/${lobbyInput}`)
+    navigate(`/join/${lobbyInput}/lobby`)
   }
 
   return (
@@ -39,7 +39,7 @@ export function LandingScreen({ ...props }: LandingScreenProps) {
       <label htmlFor="host-button" hidden={true}>
         Host a new game
       </label>
-      <button name="host-button" onClick={() => navigate('/host')}>
+      <button name="host-button" onClick={() => navigate('/host/lobby')}>
         host
       </button>
     </div>
