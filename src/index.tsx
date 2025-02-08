@@ -1,21 +1,30 @@
-import React from 'react'
 import { css, Global } from '@emotion/react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { GameHostContextProvider } from './context/game-host-context'
+import { Hand } from './hand/hand'
 import { HostLobby } from './lobby/host-lobby'
+import { JoinLobby } from './lobby/join-lobby'
 import { LandingScreen } from './lobby/landing-screen'
 import { LobbyWrapper } from './lobby/lobby-wrapper'
-import reportWebVitals from './reportWebVitals'
 import { Table } from './table/table'
-import { JoinLobby } from './lobby/join-lobby'
-import { Hand } from './hand/hand'
 
 const globalStyles = css`
   body {
     margin: 0;
-    font-family: 'Arial Rounded MT Bold', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family:
+      'Arial Rounded MT Bold',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      'Roboto',
+      'Oxygen',
+      'Ubuntu',
+      'Cantarell',
+      'Fira Sans',
+      'Droid Sans',
+      'Helvetica Neue',
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #000;
@@ -63,8 +72,3 @@ root.render(
     </BrowserRouter>
   </>,
 )
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
