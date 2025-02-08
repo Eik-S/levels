@@ -4,10 +4,10 @@ import { Card } from './models/card-model'
 export function GameCard({ value, color, ...props }: Card) {
   return (
     <div css={styles.card(color)} {...props}>
-      <span>{value}</span>
-      <span>{value}</span>
-      <span>{value}</span>
-      <span>{value}</span>
+      <span>L</span>
+      <span>V</span>
+      <span>S</span>
+      <span>L</span>
     </div>
   )
 }
@@ -17,10 +17,11 @@ const styles = {
     max-width: 250px;
     min-width: 50px;
     background-color: ${color};
-    border: 0.7rem solid white;
+    border: 0.7rem solid var(--color-accent, black);
     border-radius: 16px;
     padding: 4px 14px;
     aspect-ratio: 0.65;
+    margin: 150px;
 
     display: grid;
     grid-template-columns: auto auto;

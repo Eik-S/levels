@@ -27,8 +27,18 @@ const globalStyles = css`
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #000;
-    color: white;
+
+    --color-main: white;
+    --color-accent: black;
+    background-color: var(--color-main, white);
+    color: var(--color--accent, black);
+
+    @media (prefers-color-scheme: dark) {
+      --color-main: black;
+      --color-accent: white;
+      background-color: var(--color-main, black);
+      color: var(--color-accent, white);
+    }
   }
 
   button {
